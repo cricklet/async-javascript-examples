@@ -3,27 +3,38 @@
 import { cacheGet, cacheSet } from './cache';
 import { dbGet } from './db';
 
+function getData(token, callback) {
+  cacheGet(token, function (err, data) {
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    if (!data) {
+      dbGet(token, function (err, data) {
+        if (err) {
+          callback(err);
+          return;
+        }
+        cacheSet(token, data);
+        callback(null, data);
+      });
+      return;
+    }
+
+    callback(null, data);
+  });
+}
+
 function getId (token, callback) {
   console.log("\nGetting '" + token + "'");
-
-  cacheGet(token, function (err, id) {
-    if (err) {
-      dbGet(token, function (err, id) {
-        if (err) {
-          cacheSet(token, undefined);
-          callback(new Error("401: Authentication token is incorrect."));
-        } else {
-          cacheSet(token, id);
-          callback(null, id);
-        }
-      });
-    } else {
-      if (id === undefined) {
-        callback(new Error("401: Authentication token is incorrect."));
-        return;
-      }
-      callback(null, id);
+  getData(token, function (err, data) {
+    if (!data || data.id == undefined) {
+      callback(new Error("401: Authentication token is incorrect."));
+      return;
     }
+
+    callback(null, data.id);
   });
 }
 

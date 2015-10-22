@@ -4,21 +4,15 @@ var cache = {
 };
 
 function cacheGet (token, callback) {
-  if (token in cache) {
-    setTimeout(function () {
-      console.log("## cache-get: success (" + cache[token] + ")");
-      callback(null, cache[token]);
-    }, 0);
-  } else {
-    setTimeout(function () {
-      console.log("## cache-get: failed");
-      callback(new Error("Couldn't find token in cache."));
-    }, 0);
-  }
+  setTimeout(function () {
+    console.log("## cache-get: " + cache[token]);
+    callback(null, cache[token]);
+  }, 0);
 }
-function cacheSet(token, id) {
-  console.log("## cache-set: " + id);
-  cache[token] = id;
+
+function cacheSet(token, user, id) {
+  console.log("## cache-set: " + user + ", " + id);
+  cache[token] = {'user': user, 'id': id};
 }
 
 export {
