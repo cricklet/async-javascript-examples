@@ -29,6 +29,11 @@ function getData(token, callback) {
 function getId (token, callback) {
   console.log("\nGetting '" + token + "'");
   getData(token, function (err, data) {
+    if (err) {
+      callback(err);
+      return;
+    }
+
     if (!data || data.id == undefined) {
       callback(new Error("401: Authentication token is incorrect."));
       return;
@@ -37,6 +42,8 @@ function getId (token, callback) {
     callback(null, data.id);
   });
 }
+//////////////////////////////////////////////////////////////////////////////////
+// Run the code!
 
 function log (err, id) {
   if (err) {
@@ -45,9 +52,6 @@ function log (err, id) {
     console.log("# got id: " + id);
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////////
-// Run the code!
 
 getId('real-token', function (err, id) {
   log(err, id);
