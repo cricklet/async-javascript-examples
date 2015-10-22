@@ -8,36 +8,26 @@ import { dbGet } from './db';
 var cacheGetAsync = promisify(cacheGet);
 var dbGetAsync = promisify(dbGet);
 
-var getIdAsyncMissHelper = co.wrap(function * (token) {
-  var id;
-
-  try {
-    id = yield dbGetAsync(token);
-  } catch (err) {
-    id = undefined;
+var getDataAsync = co.wrap(function * (token) {
+  var data = yield cacheGetAsync(token);
+  if (data) {
+    return data;
   }
 
-  cacheSet(token, id);
-  return id;
-});
+  data = yield dbGetAsync(token);
+  cacheSet(token, data);
 
-var getIdAsyncHelper = co.wrap(function * (token) {
-  try {
-    return yield cacheGetAsync(token);
-  } catch (err) {
-    return yield getIdAsyncMissHelper(token);
-  }
+  return data;
 });
 
 var getIdAsync = co.wrap(function * (token) {
   console.log("\nGetting '" + token + "'");
 
-  var id = yield getIdAsyncHelper(token);
-  if (id == undefined) {
+  var data = yield getDataAsync(token);
+  if (!data || data.id == undefined) {
     throw new Error("401: Authentication token is incorrect.");
   }
-
-  return id;
+  return data.id;
 });
 
 //////////////////////////////////////////////////////////////////////////////////
