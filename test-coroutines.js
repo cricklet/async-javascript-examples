@@ -2,22 +2,22 @@
 
 import promisify from 'es6-promisify';
 import co from 'co';
-import { redisGet, redisSet } from './redis';
-import { postgresGet } from './postgres';
+import { cacheGet, cacheSet } from './cache';
+import { dbGet } from './db';
 
-var redisGetAsync = promisify(redisGet);
-var postgresGetAsync = promisify(postgresGet);
+var cacheGetAsync = promisify(cacheGet);
+var dbGetAsync = promisify(dbGet);
 
 var getIdAfterMissAsync = co.wrap(function * (token) {
   var id;
 
   try {
-    id = yield postgresGetAsync(token);
+    id = yield dbGetAsync(token);
   } catch (err) {
     id = undefined;
   }
 
-  redisSet(token, id);
+  cacheSet(token, id);
   return id
 });
 
@@ -26,7 +26,7 @@ var getIdAsync = co.wrap(function * (token) {
 
   var id;
   try {
-    id = yield redisGetAsync(token);
+    id = yield cacheGetAsync(token);
   } catch (err) {
     id = yield getIdAfterMissAsync(token);
   }

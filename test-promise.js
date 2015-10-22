@@ -1,36 +1,36 @@
 "use strict";
 
 import promisify from 'es6-promisify';
-import { redisGet, redisSet } from './redis';
-import { postgresGet } from './postgres';
+import { cacheGet, cacheSet } from './cache';
+import { dbGet } from './db';
 
-var redisGetPromise = promisify(redisGet);
-var postgresGetPromise = promisify(postgresGet);
+var cacheGetPromise = promisify(cacheGet);
+var dbGetPromise = promisify(dbGet);
 
-function getIdFromPostgresPromise(token) {
-  var idPromise = postgresGetPromise(token);
+function getIdFromDBPromise(token) {
+  var idPromise = dbGetPromise(token);
 
   return idPromise.then(
     function (id) {
-      redisSet(token, id);
+      cacheSet(token, id);
       return id;
     },
     function (err) {
-      redisSet(token, undefined);
+      cacheSet(token, undefined);
       return undefined;
     }
   );
 }
 
-function getIdFromRedisPromise(token) {
-  var idPromise = redisGetPromise(token);
-  
+function getIdFromCachePromise(token) {
+  var idPromise = cacheGetPromise(token);
+
   return idPromise.then(
     function (id) {
       return id;
     },
     function (err) {
-      return getIdFromPostgresPromise(token);
+      return getIdFromDBPromise(token);
     }
   );
 }
@@ -38,7 +38,7 @@ function getIdFromRedisPromise(token) {
 function getIdPromise(token) {
   console.log("\nGetting '" + token + "'");
 
-  return getIdFromRedisPromise(token)
+  return getIdFromCachePromise(token)
     .then(function (id) {
       if (id === undefined) {
 	throw new Error("401: Authentication token is incorrect.");
