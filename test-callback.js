@@ -19,16 +19,17 @@ function getId (token, callback) {
 	  redisSet(token, undefined);
 	  callback(new Error("401: Authentication token is incorrect."));
 	} else {
-	  console.log("## got id with postgres");
+	  console.log("## got id with postgres: " + id);
 	  redisSet(token, id);
 	  callback(null, id);
 	}
       });
-    } else if (id === undefined) {
-      console.log("## got undefined id with redis");
-      callback(new Error("401: Authentication token is incorrect."));
     } else {
-      console.log("## got id with redis");
+      console.log("## got id with redis: " + id);
+      if (id === undefined) {
+	callback(new Error("401: Authentication token is incorrect."));
+	return;
+      }
       callback(null, id);
     }
   });

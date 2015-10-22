@@ -8,19 +8,16 @@ import { postgresGet } from './postgres';
 var redisGetAsync = promisify(redisGet);
 var postgresGetAsync = promisify(postgresGet);
 
-var getIdFromRedisAsync = co.wrap(function * (token) {
-});
-
-var _getIdAsyncMiss = co.wrap(function * (token) {
-  var id;
+var getIdAfterMissAsync = co.wrap(function * (token) {
   try {
-    id = yield postgresGetAsync(token);
-  } catch (err) {
-  } finally {
+    var id = yield postgresGetAsync(token);
     redisSet(token, id);
-  }
+    return id
 
-  return id;
+  } catch (err) {
+    redisSet(token, undefined);
+    return undefined;
+  }
 });
 
 var getIdAsync = co.wrap(function * (token) {
@@ -31,15 +28,10 @@ var getIdAsync = co.wrap(function * (token) {
   }
 
   var id;
-
   try {
     id = yield redisGetAsync(token);
-    console.log("## got id with redis: " + id);
-
   } catch (err) {
-    console.log("## failed to get id with redis: " + id);
-    id = yield _getIdAsyncMiss(token);
-    console.log("## got id with postgres: " + id);
+    id = yield getIdAfterMissAsync(token);
   }
 
   if (id === undefined) {

@@ -12,14 +12,14 @@ function getIdFromPostgresPromise(token) {
 
   return idPromise.then(
     function (id) {
-      console.log("## got id with postgres");
+      console.log("## got id with postgres: " + id);
       redisSet(token, id);
       return id;
     },
     function (err) {
       console.log("## failed to get id with postgres");
       redisSet(token, undefined);
-      throw new Error("401: Authentication token is incorrect.");
+      return undefined;
     }
   );
 }
@@ -29,12 +29,7 @@ function getIdFromRedisPromise(token) {
   
   return idPromise.then(
     function (id) {
-      if (id === undefined) {
-	console.log("## got undefined id with redis");
-	throw new Error("401: Authentication token is incorrect.");
-      }
-      
-      console.log("## got id with redis");
+      console.log("## got id with redis: " + id);
       return id;
     },
     function (err) {
@@ -51,7 +46,13 @@ function getIdPromise(token) {
     callback(new Error("401: Authentication token is malformed or missing."));
   }
 
-  return getIdFromRedisPromise(token);
+  return getIdFromRedisPromise(token)
+    .then(function (id) {
+      if (id === undefined) {
+	throw new Error("401: Authentication token is incorrect.");
+      }
+      return id;
+    });
 }
 
 //////////////////////////////////////////////////////////////////////////////////
