@@ -42,6 +42,9 @@ function log (err, id) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+// Run the code!
+
 getId('real-token', function (err, id) {
   log(err, id);
   

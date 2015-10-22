@@ -10,16 +10,18 @@ var postgresGetPromise = promisify(postgresGet);
 function getIdFromPostgresPromise(token) {
   var idPromise = postgresGetPromise(token);
 
-  return idPromise.then(function (id) {
-    console.log("## got id with postgres");
-    redisSet(token, id);
-    return id;
-
-  }).catch(function (err) {
-    console.log("## failed to get id with postgres");
-    redisSet(token, undefined);
-    throw new Error("401: Authentication token is incorrect.");
-  });
+  return idPromise.then(
+    function (id) {
+      console.log("## got id with postgres");
+      redisSet(token, id);
+      return id;
+    },
+    function (err) {
+      console.log("## failed to get id with postgres");
+      redisSet(token, undefined);
+      throw new Error("401: Authentication token is incorrect.");
+    }
+  );
 }
 
 function getIdFromRedisPromise(token) {
@@ -51,6 +53,9 @@ function getIdPromise(token) {
 
   return getIdFromRedisPromise(token);
 }
+
+//////////////////////////////////////////////////////////////////////////////////
+// Run the code!
 
 function success (id) {
   console.log("# got id: " + id);
