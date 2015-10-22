@@ -16,7 +16,7 @@ function getData(token, callback) {
           callback(err);
           return;
         }
-        cacheSet(token, data);
+        cacheSet(token, data || {});
         callback(null, data);
       });
       return;

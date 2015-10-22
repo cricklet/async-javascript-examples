@@ -12,7 +12,7 @@ function getDataFromDBPromise(token) {
 
   return dataPromise.then(
     function (data) {
-      cacheSet(token, data);
+      cacheSet(token, data || {});
       return data;
     }
   );

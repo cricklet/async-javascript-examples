@@ -8,43 +8,43 @@ import { dbGet } from './db';
 var cacheGetAsync = promisify(cacheGet);
 var dbGetAsync = promisify(dbGet);
 
-var getDataAsync = co.wrap(function * (token) {
-  var data = yield cacheGetAsync(token);
+async function getDataAsync (token) {
+  var data = await cacheGetAsync(token);
   if (data) {
     return data;
   }
 
-  data = yield dbGetAsync(token);
+  data = await dbGetAsync(token);
   cacheSet(token, data || {});
 
   return data;
-});
+}
 
-var getIdAsync = co.wrap(function * (token) {
+async function getIdAsync (token) {
   console.log("\nGetting '" + token + "'");
 
-  var data = yield getDataAsync(token);
+  var data = await getDataAsync(token);
   if (!data || data.id == undefined) {
     throw new Error("401: Authentication token is incorrect.");
   }
   return data.id;
-});
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // Run the code!
 
-var run = co.wrap(function * (token) {
+async function run (token) {
   try {
-    var id = yield getIdAsync(token);
+    var id = await getIdAsync(token);
     console.log("# got id: " + id);
   } catch (err) {
     console.log("# error: " + err);
   }
-});
+}
 
-co(function * () {
-  yield run('real-token');
-  yield run('real-token');
-  yield run('fake-token');
-  yield run('fake-token');
-});
+(async function () {
+  await run('real-token');
+  await run('real-token');
+  await run('fake-token');
+  await run('fake-token');
+} ());
