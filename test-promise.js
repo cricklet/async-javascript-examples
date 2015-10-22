@@ -27,9 +27,6 @@ function getDataFromCachePromise(token) {
         return getDataFromDBPromise(token);
       }
       return data;
-    },
-    function (err) {
-      throw err;
     }
   );
 }
