@@ -39,12 +39,12 @@ function getIdPromise(token) {
   console.log("\nGetting '" + token + "'");
 
   return getIdFromCachePromise(token)
-    .then(function (id) {
-      if (id === undefined) {
-    throw new Error("401: Authentication token is incorrect.");
-      }
-      return id;
-    });
+  .then(function (id) {
+    if (id === undefined) {
+      throw new Error("401: Authentication token is incorrect.");
+    }
+    return id;
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -59,10 +59,10 @@ function error (err) {
 }
 
 getIdPromise('real-token')
-  .then(success, error)
-  .then(getIdPromise.bind(null, 'real-token'))
-  .then(success,error)
-  .then(getIdPromise.bind(null, 'fake-token'))
-  .then(success,error)
-  .then(getIdPromise.bind(null, 'fake-token'))
-  .then(success,error);
+.then(success, error)
+.then(getIdPromise.bind(null, 'real-token'))
+.then(success,error)
+.then(getIdPromise.bind(null, 'fake-token'))
+.then(success,error)
+.then(getIdPromise.bind(null, 'fake-token'))
+.then(success,error);

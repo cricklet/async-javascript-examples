@@ -9,18 +9,18 @@ function getId (token, callback) {
   cacheGet(token, function (err, id) {
     if (err) {
       dbGet(token, function (err, id) {
-    if (err) {
-      cacheSet(token, undefined);
-      callback(new Error("401: Authentication token is incorrect."));
-    } else {
-      cacheSet(token, id);
-      callback(null, id);
-    }
+        if (err) {
+          cacheSet(token, undefined);
+          callback(new Error("401: Authentication token is incorrect."));
+        } else {
+          cacheSet(token, id);
+          callback(null, id);
+        }
       });
     } else {
       if (id === undefined) {
-    callback(new Error("401: Authentication token is incorrect."));
-    return;
+        callback(new Error("401: Authentication token is incorrect."));
+        return;
       }
       callback(null, id);
     }
@@ -48,7 +48,7 @@ getId('real-token', function (err, id) {
       log(err, id);
 
       getId('fake-token', function (err, id) {
-    log(err, id);
+        log(err, id);
       });
     });
   });

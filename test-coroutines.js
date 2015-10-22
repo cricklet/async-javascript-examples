@@ -8,7 +8,7 @@ import { dbGet } from './db';
 var cacheGetAsync = promisify(cacheGet);
 var dbGetAsync = promisify(dbGet);
 
-var dbGetAndUpdateCacheAsync = co.wrap(function * (token) {
+var getIdAsyncMissHelper = co.wrap(function * (token) {
   var id;
 
   try {
