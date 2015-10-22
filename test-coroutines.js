@@ -9,23 +9,20 @@ var redisGetAsync = promisify(redisGet);
 var postgresGetAsync = promisify(postgresGet);
 
 var getIdAfterMissAsync = co.wrap(function * (token) {
-  try {
-    var id = yield postgresGetAsync(token);
-    redisSet(token, id);
-    return id
+  var id;
 
+  try {
+    id = yield postgresGetAsync(token);
   } catch (err) {
-    redisSet(token, undefined);
-    return undefined;
+    id = undefined;
   }
+
+  redisSet(token, id);
+  return id
 });
 
 var getIdAsync = co.wrap(function * (token) {
   console.log("\nGetting '" + token + "'");
-
-  if (!token) {
-    callback(new Error("401: Authentication token is malformed or missing."));
-  }
 
   var id;
   try {
@@ -34,7 +31,7 @@ var getIdAsync = co.wrap(function * (token) {
     id = yield getIdAfterMissAsync(token);
   }
 
-  if (id === undefined) {
+  if (id == undefined) {
     throw new Error("401: Authentication token is incorrect.");
   }
 
