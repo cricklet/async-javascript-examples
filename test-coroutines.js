@@ -8,7 +8,7 @@ import { dbGet } from './db';
 var cacheGetAsync = promisify(cacheGet);
 var dbGetAsync = promisify(dbGet);
 
-var getIdAfterMissAsync = co.wrap(function * (token) {
+var dbGetAndUpdateCacheAsync = co.wrap(function * (token) {
   var id;
 
   try {
@@ -18,19 +18,21 @@ var getIdAfterMissAsync = co.wrap(function * (token) {
   }
 
   cacheSet(token, id);
-  return id
+  return id;
+});
+
+var getIdAsyncHelper = co.wrap(function * (token) {
+  try {
+    return yield cacheGetAsync(token);
+  } catch (err) {
+    return yield getIdAsyncMissHelper(token);
+  }
 });
 
 var getIdAsync = co.wrap(function * (token) {
   console.log("\nGetting '" + token + "'");
 
-  var id;
-  try {
-    id = yield cacheGetAsync(token);
-  } catch (err) {
-    id = yield getIdAfterMissAsync(token);
-  }
-
+  var id = yield getIdAsyncHelper(token);
   if (id == undefined) {
     throw new Error("401: Authentication token is incorrect.");
   }
