@@ -41,7 +41,7 @@ function getIdPromise(token) {
   return getIdFromCachePromise(token)
     .then(function (id) {
       if (id === undefined) {
-	throw new Error("401: Authentication token is incorrect.");
+    throw new Error("401: Authentication token is incorrect.");
       }
       return id;
     });
