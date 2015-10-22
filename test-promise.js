@@ -18,7 +18,7 @@ function getDataFromDBPromise(token) {
   );
 }
 
-function getDataFromCachePromise(token) {
+function getDataPromise(token) {
   var dataPromise = cacheGetPromise(token);
 
   return dataPromise.then(
@@ -34,7 +34,7 @@ function getDataFromCachePromise(token) {
 function getIdPromise(token) {
   console.log("\nGetting '" + token + "'");
 
-  return getDataFromCachePromise(token)
+  return getDataPromise(token)
   .then(function (data) {
     if (!data || data.id === undefined) {
       throw new Error("401: Authentication token is incorrect.");
