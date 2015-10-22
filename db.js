@@ -1,12 +1,12 @@
 "use strict";
 
 var db = {
-  'real-token': {'user': 'kenrick', 'id': 'real-token'}
+  'real-token': {'user': 'kenrick', 'id': 'real-id'}
 };
 
 function dbGet (token, callback) {
   setTimeout(function () {
-    console.log("## db-get: " + db[token]);
+    console.log("## db-get: " + JSON.stringify(db[token]));
     callback(null, db[token]);
   }, 0);
 }

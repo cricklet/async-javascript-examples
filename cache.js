@@ -5,14 +5,14 @@ var cache = {
 
 function cacheGet (token, callback) {
   setTimeout(function () {
-    console.log("## cache-get: " + cache[token]);
+    console.log("## cache-get: " + JSON.stringify(cache[token]));
     callback(null, cache[token]);
   }, 0);
 }
 
-function cacheSet(token, user, id) {
-  console.log("## cache-set: " + user + ", " + id);
-  cache[token] = {'user': user, 'id': id};
+function cacheSet(token, data) {
+  console.log("## cache-set: " + JSON.stringify(data));
+  cache[token] = data;
 }
 
 export {

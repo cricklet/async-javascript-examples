@@ -7,30 +7,29 @@ import { dbGet } from './db';
 var cacheGetPromise = promisify(cacheGet);
 var dbGetPromise = promisify(dbGet);
 
-function getIdFromDBPromise(token) {
-  var idPromise = dbGetPromise(token);
+function getDataFromDBPromise(token) {
+  var dataPromise = dbGetPromise(token);
 
-  return idPromise.then(
-    function (id) {
-      cacheSet(token, id);
-      return id;
-    },
-    function (err) {
-      cacheSet(token, undefined);
-      return undefined;
+  return dataPromise.then(
+    function (data) {
+      cacheSet(token, data);
+      return data;
     }
   );
 }
 
-function getIdFromCachePromise(token) {
-  var idPromise = cacheGetPromise(token);
+function getDataFromCachePromise(token) {
+  var dataPromise = cacheGetPromise(token);
 
-  return idPromise.then(
-    function (id) {
-      return id;
+  return dataPromise.then(
+    function (data) {
+      if (!data) {
+        return getDataFromDBPromise(token);
+      }
+      return data;
     },
     function (err) {
-      return getIdFromDBPromise(token);
+      throw err;
     }
   );
 }
@@ -38,12 +37,12 @@ function getIdFromCachePromise(token) {
 function getIdPromise(token) {
   console.log("\nGetting '" + token + "'");
 
-  return getIdFromCachePromise(token)
-  .then(function (id) {
-    if (id === undefined) {
+  return getDataFromCachePromise(token)
+  .then(function (data) {
+    if (!data || data.id === undefined) {
       throw new Error("401: Authentication token is incorrect.");
     }
-    return id;
+    return data.id;
   });
 }
 
